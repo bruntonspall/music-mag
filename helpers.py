@@ -17,9 +17,9 @@ def render_admin_template(self, end_point, template_values):
     user = users.get_current_user()
     if user:
         template_values['greeting'] = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" %
-                    (user.nickname(), users.create_logout_url("/admin/")))
+                    (user.nickname(), users.create_logout_url("/")))
 
-    render_template(self, end_point, template_values)
+    render_template(self, 'admin/'+end_point, template_values)
 
 def render_template(self, end_point, template_values):
     path = os.path.join(os.path.dirname(__file__), "templates/" + end_point)

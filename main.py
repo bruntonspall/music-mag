@@ -17,15 +17,27 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from helpers import *
+from google.appengine.ext.webapp.util import login_required
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-        render_template(self, 'home.html', {})
-        self.response.out.write('Hello world!')
+        render_template(self, 'home.html', {'message':'World'})
+
+class AdminHandler(webapp.RequestHandler):
+    @login_required
+    def get(self):
+        render_admin_template(self, 'home.html', {})
+
+class EditionHandler(webapp.RequestHandler):
+    def get(self, edition=None):
+        render_template(self, 'issue.html', {'edition': edition})
+
 
 
 def main():
-    application = webapp.WSGIApplication([('/', MainHandler)],
+    application = webapp.WSGIApplication([('/', MainHandler),
+    ('/admin', AdminHandler),
+    ('/issue(?:/(?P<edition>\d+))?', EditionHandler)],
                                          debug=True)
     util.run_wsgi_app(application)
 
