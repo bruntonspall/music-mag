@@ -1,29 +1,33 @@
 {% extends "adminbase.html" %}
+{% block javascript %}
+<script>
+$(function(){
+	$('#story_search').autocomplete({source:'/api/tags.json', select:function(event, ui){
+		$('#prospective_list').empty();
+		$.getJSON('/api/tag/'+ui.item.id+'.json', function(data) {
+			
+			$.each(data, function(index, item){
+				$('#prospective_list').append("<li class='story prospective' id='"+item.id+"_0'><span class='title'>"+item.headline+"</span><span class='trailtext'>"+item.trailtext+"</span></li></p>");
+			});
+		});
+	}});
+	$('#submit-edition').click(function(){
+		var pages = $('#accepted_list').sortable("serialize");
+		$.post('/issue/new', pages);
+		$('#log').empty();
+		$('#log').append("<p>"+pages+"</p>");
+	});
+	$('#prospective_list').sortable({connectWith: '.accepted_list', revert: true});
+	$('#accepted_list').sortable({revert: true});
+});
+</script>
+{% endblock	%}
 {% block mainbody %}
 <div class="grid_24">
 	<h2>Article Selector</h2>
 </div>
-<div class="grid_8 prospective_list">
+<div class="grid_9 prospective_list">
 	<input type="text" id="story_search" name="story_search" placeholder="Band/Album/Keyword">
-	<script>
-	$(function(){
-		$('#story_search').autocomplete({source:'/api/tags.json', select:function(event, ui){
-			$('#prospective_list').empty();
-			$.getJSON('/api/tag/'+ui.item.id+'.json', function(data) {
-				
-				$.each(data, function(index, item){
-					$('#prospective_list').append("<li class='story prospective' id='"+item.id+"_0'><span class='title'>"+item.headline+"</span><span class='trailtext'>"+item.trailtext+"</span></li></p>");
-				});
-			});
-		}});
-		$('#submit-edition').click(function(){
-			var pages = $('#accepted_list').sortable("serialize");
-			$.post('/issue/new', pages);
-			$('#log').empty();
-			$('#log').append("<p>"+pages+"</p>");
-			})
-	});
-	</script>
 	 
 	<ul id="prospective_list" class="prospective_list drop_target">
 		{% for story in prospective_stories %}
@@ -35,25 +39,16 @@
 		{% endfor %}
 	</ul>
 </div>
-<div class="grid_8">
+<div class="grid_9">
 	<ul id="accepted_list" class="accepted_list drop_target">
-		{% for story in edition.stories %}
+		{% for story in pages %}
 		<li class="story accepted">
 			<span class="title">{{story.title}}</span>
-			<span class="source">{{story.source}}</span>
 			<span class="trailtext">{{story.trailtext}}</span>
 		</li>
 		{% endfor %}
 	</ul>
 	<a id="submit-edition" class="button">Submit Edition</a>
 </div>
-<div id="log" class"grid_24"></div>
-{% endblock %}
-{% block javascript %}
-<script>
-$(function() {
-	$('#prospective_list').sortable({connectWith: '.accepted_list', revert: true});
-	$('#accepted_list').sortable({revert: true});
-});
-</script>
+<div id="log" class"clear grid_24"></div>
 {% endblock %}
