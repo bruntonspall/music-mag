@@ -2,12 +2,21 @@
 <head>
 	<script src="/static/js/jquery-1.4.2.min.js"></script>
 <body>
-	<h1>Welcome {{message}}</h1>
-	<p id="test"></p>
-	<script>
-	$(function(){
-		$('#test').append('Test');
-	});
-	</script>
+	<h1>Music Mag Edition 1</h1>
+	<div class="table-of-contents">
+		<ol>
+			{% for page in pages %}
+				<li><span><a href="#page{{page.number}}">{{page.number}}</a></span><span class="trailtext">{{trailtext}}</span></li>
+			{% endfor %}
+		</ol>
+		
+		</div>
+	{% for page in pages %}
+	<div class="page" id="page{{page.number}}">
+		<h2>{{page.number}} - {{page.headline}}</h2>
+		<p class="two_col">{{page.body}}</p>
+		<div class="image"><img src="page.image"></div>
+	</div>
+	{% endfor %}
 </body>
 </html>

@@ -20,9 +20,10 @@ import logging
 import json
 
 import helpers
+from settings import *
 
-GUARDIAN_API_HOST = 'http://localhost:8700/content-api/api'
-#GUARDIAN_API_HOST = 'http://content.guardianapis.com'
+#GUARDIAN_API_HOST = 'http://localhost:8700/content-api/api'
+GUARDIAN_API_HOST = 'http://content.guardianapis.com'
 
 class Tag(db.Model):
     name = db.StringProperty(required=True)
@@ -50,9 +51,10 @@ class Tag(db.Model):
             page += 1
 
     def get_guardian_articles(self):
-        url = GUARDIAN_API_HOST+"/%s.json?show-fields=all&api-key=musichackday&userTier=partner" % (self.guardian_id)
+        url = GUARDIAN_API_HOST+"/%s.json?show-fields=all&api-key=%s" % (self.guardian_id, GU_API_KEY)
         logging.info("Requesting %s", url)
         response = json.loads(urlfetch.fetch(url).content)
         logging.info("Got response: %s",response)
         return [{'headline':content["fields"]["headline"], 'trailtext':content["fields"]["trailText"], 'id':content["id"]} for content in response["response"]["results"]]
         
+    
