@@ -54,7 +54,23 @@ class Tag(db.Model):
         url = GUARDIAN_API_HOST+"/%s.json?show-fields=all&api-key=%s" % (self.guardian_id, GU_API_KEY)
         logging.info("Requesting %s", url)
         response = json.loads(urlfetch.fetch(url).content)
-        logging.info("Got response: %s",response)
         return [{'headline':content["fields"]["headline"], 'trailtext':content["fields"]["trailText"], 'id':content["id"]} for content in response["response"]["results"]]
         
+class Page(db.Model):
+    number = db.IntegerProperty(required=True)
+    guardian_article_id = db.StringProperty(required=False)
+    headline = db.StringProperty(required=True)
+    trailtext = db.StringProperty(required=True)
+    body = db.TextProperty(required=True)
+    image = db.StringProperty(required=False)
+    
+def get_content_for_guardian_id(id):
+    url = GUARDIAN_API_HOST+"/%s.json?show-fields=all&show-media=picture&api-key=%s" % (id, GU_API_KEY)
+    logging.info("Requesting %s", url)
+    response = json.loads(urlfetch.fetch(url).content)
+    content = response["response"]["content"]
+    image = None
+    if content.has_key('mediaAssets'):
+        image = content["mediaAssets"][0]["file"]
+    return {'headline':content["fields"]["headline"], 'trailtext':content["fields"]["trailText"],'body':content["fields"]["body"], 'image':image,'id':content["id"]}
     

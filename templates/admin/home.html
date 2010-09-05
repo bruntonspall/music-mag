@@ -8,13 +8,19 @@
 	<script>
 	$(function(){
 		$('#story_search').autocomplete({source:'/api/tags.json', select:function(event, ui){
+			$('#prospective_list').empty();
 			$.getJSON('/api/tag/'+ui.item.id+'.json', function(data) {
 				
 				$.each(data, function(index, item){
-					$('#prospective_list').append("<li class='story prospective' id='"+item.id+"'><span class='title'>"+item.headline+"</span><span class='trailtext'>"+item.trailtext+"</span></li></p>");
+					$('#prospective_list').append("<li class='story prospective' id='"+item.id+"_0'><span class='title'>"+item.headline+"</span><span class='trailtext'>"+item.trailtext+"</span></li></p>");
 				});
 			});
 		}});
+		$('#submit-edition').click(function(){
+			var pages = $('#accepted_list').sortable("serialize");
+			$.post('/issue/new', pages);
+			$('#log').append("<p>"+pages+"</p>");
+			})
 	});
 	</script>
 	 
@@ -29,7 +35,7 @@
 	</ul>
 </div>
 <div class="grid_8">
-	<ul class="accepted_list drop_target">
+	<ul id="accepted_list" class="accepted_list drop_target">
 		{% for story in edition.stories %}
 		<li class="story accepted">
 			<span class="title">{{story.title}}</span>
@@ -38,14 +44,15 @@
 		</li>
 		{% endfor %}
 	</ul>
+	<a id="submit-edition" class="button">Submit Edition</a>
 </div>
 <div id="log"></div>
 {% endblock %}
 {% block javascript %}
 <script>
 $(function() {
-	$('.prospective_list').sortable({connectWith: '.accepted_list', revert: true});
-	$('.accepted_list').sortable({revert: true});
+	$('#prospective_list').sortable({connectWith: '.accepted_list', revert: true});
+	$('#accepted_list').sortable({revert: true});
 });
 </script>
 {% endblock %}
