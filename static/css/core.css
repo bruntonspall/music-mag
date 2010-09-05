@@ -104,3 +104,39 @@ li span.source {
 li span.trailtext {
     
 }
+
+.page {
+    
+}
+
+.twocol {
+    column-count: 3;
+    -moz-column-count: 3;
+    -webkit-column-count: 3;
+    column-gap: 20px;
+    -moz-column-gap: 20px;
+    -webkit-column-gap: 20px;
+}
+
+.page h2 {
+    font-size: 24px;
+    padding: 20px 0px 15px 0px;
+}
+
+.story h2 {
+    font-size: 16px;
+    padding: 20px 0px 15px 0px;
+/*    column-span: all;
+    -moz-column-span: all;
+    -webkit-column-span: all;
+    */
+}
+
+.story img {
+    float: left;
+    width: 100%;
+}
+
+.next {
+    font-size: 24px;    
+}

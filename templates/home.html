@@ -1,22 +1,78 @@
 <html>
 <head>
+	<title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/main.css" media="all" />
+    <!-- main.css is a gateway file. You will spend your time in core.css -->
+
+    <link rel="stylesheet" href="/static/css/_print/main.css" media="print" />
+
+    <!-- These are IE-specific conditional style sheets.
+         You might consider removing the ones you don't end up using. -->
+
+    <!--[if IE]>
+    <link rel="stylesheet" href="/static/css/_patches/win-ie-all.css" media="all" />
+    <![endif]-->
+    <!--[if IE 7]>
+    <link rel="stylesheet" href="/static/css/_patches/win-ie7.css" media="all" />
+    <![endif]-->
+    <!--[if lt IE 7]>
+    <link rel="stylesheet" href="/static/css/_patches/win-ie-old.css" media="all" />
+    <![endif]-->
+    <link rel="stylesheet" href="/static/css/smoothness/jquery-ui-1.8.4.custom.css" media="all" />
+    <link rel="stylesheet" href="/static/css/960_24_col.css" media="all" />
+	{% block css %}{% endblock %}
+
 	<script src="/static/js/jquery-1.4.2.min.js"></script>
+    <script src="/static/js/jquery-ui-1.8.4.custom.min.js"></script>
+    <script src="/static/js/functions.js"></script>
+    <script src="/static/js/modernizr-1.5.min.js"></script>
+
+<script>
+function hidePage(page) {
+	$("#page"+page).fadeOut();
+}
+function showPage(page) {
+	$("#page"+page).fadeIn();
+}
+var maxpage = {{pages.count}};
+$(function(){
+	$(".page").hide();
+	var pagenum = 0;
+	$("#next").click(function() {
+		hidePage(pagenum);
+		pagenum = (pagenum + 1) % maxpage;
+		showPage(pagenum);
+	});
+	$(".page").click(function() {
+		hidePage(pagenum);
+		pagenum = (pagenum + 1) % maxpage;
+		showPage(pagenum);
+	});
+	showPage(pagenum);
+})
+</script>
+	{% block scripts %}{% endblock %}
+
+	{% block head %}{% endblock %}
+</head>
 <body>
-	<h1>Music Mag Edition 1</h1>
-	<div class="table-of-contents">
+	<div class="container_24">
+		<h1>Music Mag Edition 1</h1>		
+	<div class="page table-of-contents grid_24" id="page0">
 		<ol>
 			{% for page in pages %}
-				<li><span><a href="#page{{page.number}}">{{page.number}}</a></span><span class="trailtext">{{trailtext}}</span></li>
+				<li class="tocline"><span><a href="#page{{page.number}}">{{page.number}}</a></span><span class="trailtext">{{page.headline}}</span></li>
 			{% endfor %}
 		</ol>
 		
 		</div>
 	{% for page in pages %}
-	<div class="page" id="page{{page.number}}">
+	<div class="page grid_24" id="page{{page.number}}">
 		<h2>{{page.number}} - {{page.headline}}</h2>
-		<p class="two_col">{{page.body}}</p>
-		<div class="image"><img src="{{page.image}}"></div>
+		<div class="twocol story"><img src="{{page.image}}">{{page.body}}</div>
 	</div>
 	{% endfor %}
+	<div class="grid_24 next" id="next">Next</div>
+	</div>
 </body>
 </html>

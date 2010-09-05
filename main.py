@@ -49,7 +49,16 @@ class NewEditionHandler(webapp.RequestHandler):
             id = arg.strip("[]")
             content = get_content_for_guardian_id(id)
             logging.info("Got content for %s - '%s' - image: %s", id, content['headline'], content['image'])
-            Page(number=i+1, guardian_article_id=id, headline=content['headline'], trailtext=content['trailtext'], body=content['body'], image=content['image']).save()
+            obj = Page.all().filter('number =',i+1).get()
+            if obj:
+                obj.guardian_article_id=id
+                obj.headline=content['headline']
+                obj.trailtext=content['trailtext']
+                obj.body=content['body']
+                obj.image=content['image']
+                obj.save()
+            else:
+                Page(number=i+1, guardian_article_id=id, headline=content['headline'], trailtext=content['trailtext'], body=content['body'], image=content['image']).save()
         pass
 
 class ContentHandler(webapp.RequestHandler):

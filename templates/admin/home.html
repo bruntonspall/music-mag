@@ -19,6 +19,7 @@
 		$('#submit-edition').click(function(){
 			var pages = $('#accepted_list').sortable("serialize");
 			$.post('/issue/new', pages);
+			$('#log').empty();
 			$('#log').append("<p>"+pages+"</p>");
 			})
 	});
@@ -46,7 +47,7 @@
 	</ul>
 	<a id="submit-edition" class="button">Submit Edition</a>
 </div>
-<div id="log"></div>
+<div id="log" class"grid_24"></div>
 {% endblock %}
 {% block javascript %}
 <script>
