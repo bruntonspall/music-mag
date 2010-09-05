@@ -1,0 +1,11 @@
+{% if callback %}{{callback}}({% endif %}
+[
+{% for tag in tags %}
+{
+"id":"{{tag.guardian_id}}",
+"value":"{{tag.name}}",
+"label":"{{tag.name}}"
+}
+{% if forloop.last %}{% else %},{% endif %}
+{% endfor %}]
+{% if callback %});({% endif %}

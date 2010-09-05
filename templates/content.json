@@ -1,0 +1,11 @@
+{% if callback %}{{callback}}({% endif %}
+[
+{% for content in tag.get_guardian_articles %}
+{
+"id": "{{content.id}}",
+"headline": "{{content.headline}}",
+"trailtext": "{{content.trailtext}}"
+}
+{% if forloop.last %}{% else %},{% endif %}
+{% endfor %}]
+{% if callback %});({% endif %}

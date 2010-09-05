@@ -16,8 +16,10 @@
 #
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
-from helpers import *
 from google.appengine.ext.webapp.util import login_required
+
+from helpers import *
+from models import *
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
@@ -32,12 +34,33 @@ class EditionHandler(webapp.RequestHandler):
     def get(self, edition=None):
         render_template(self, 'issue.html', {'edition': edition})
 
+class TagsHandler(webapp.RequestHandler):
+    def get(self):
+        term = self.request.get('term')
+        tags = Tag.all()
+        if term:
+            tags.filter('name >',term).filter('name < ',term+u'\ufffd')
+        render_template(self, 'tags.json', {'tags': tags, 'callback':self.request.get('callback')})
 
+class ContentHandler(webapp.RequestHandler):
+    def get(self, tag):
+        render_template(self, 'content.json', {'tag': Tag.all().filter('guardian_id =',tag).get(), 'callback':self.request.get('callback')})
+
+class PopulateHandler(webapp.RequestHandler):
+    @login_required
+    def get(self):
+        Tag.populate()
+        self.response.out.write('OK')
 
 def main():
-    application = webapp.WSGIApplication([('/', MainHandler),
-    ('/admin', AdminHandler),
-    ('/issue(?:/(?P<edition>\d+))?', EditionHandler)],
+    application = webapp.WSGIApplication([
+        ('/', MainHandler),
+        ('/admin', AdminHandler),
+        ('/admin/populate', PopulateHandler),
+        ('/issue(?:/(?P<edition>\d+))?', EditionHandler),
+        ('/api/tags.json', TagsHandler),
+        ('/api/tag/(?P<tag>[a-z/-]+).json', ContentHandler),
+    ],
                                          debug=True)
     util.run_wsgi_app(application)
 

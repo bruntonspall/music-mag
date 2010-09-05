@@ -1,55 +1,31 @@
 {% extends "adminbase.html" %}
 {% block mainbody %}
 <div class="grid_24">
-	<p>Edition: <input type="select">
-		<option>1</option>
-		<option>2</option>
-		<option>3</option>
-		<option>4</option>
-		</input>
-		<a class="button" href="/admin/issue/new">New Issue</a></p>
-	<p>Select articles for each page</p>
+	<h2>Article Selector</h2>
 </div>
 <div class="grid_8 prospective_list">
 	<input type="text" id="story_search" name="story_search" placeholder="Band/Album/Keyword">
 	<script>
 	$(function(){
-		$('#story_search').autocomplete({source:['Eagles', 'Metallica', 'Pink Floyd']})
+		$('#story_search').autocomplete({source:'/api/tags.json', select:function(event, ui){
+			$.getJSON('/api/tag/'+ui.item.id+'.json', function(data) {
+				
+				$.each(data, function(index, item){
+					$('#prospective_list').append("<li class='story prospective' id='"+item.id+"'><span class='title'>"+item.headline+"</span><span class='trailtext'>"+item.trailtext+"</span></li></p>");
+				});
+			});
+		}});
 	});
 	</script>
-	<ul class="prospective_list drop_target">
-		{% for story in propsective_stories %}
+	 
+	<ul id="prospective_list" class="prospective_list drop_target">
+		{% for story in prospective_stories %}
 		<li class="story prospective">
 			<span class="title">{{story.title}}</span>
 			<span class="source">{{story.source}}</span>
 			<span class="trailtext">{{story.trailtext}}</span>
 		</li>
 		{% endfor %}
-		<li class="story prospective">
-			<span class="title">Lorem Ipsum</span>
-			<span class="source">guardian.co.uk</span>
-			<span class="trailtext">Lorem  Lorem Ipsum Lorem Ipsum  Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum </span>
-		</li>
-		<li class="story prospective">
-			<span class="title">Lorem Ipsum</span>
-			<span class="source">guardian.co.uk</span>
-			<span class="trailtext">Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum  Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum </span>
-		</li>
-		<li class="story prospective">
-			<span class="title">Lorem Ipsum</span>
-			<span class="source">last.fm</span>
-			<span class="trailtext">Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum </span>
-		</li>
-		<li class="story prospective">
-			<span class="title">Lorem Ipsum</span>
-			<span class="source">guardian.co.uk</span>
-			<span class="trailtext">Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem  </span>
-		</li>
-		<li class="story prospective">
-			<span class="title">Lorem Ipsum</span>
-			<span class="source">last.fm</span>						
-			<span class="trailtext">Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lor</span>
-		</li>
 	</ul>
 </div>
 <div class="grid_8">
@@ -61,23 +37,9 @@
 			<span class="trailtext">{{story.trailtext}}</span>
 		</li>
 		{% endfor %}
-		<li class="story accepted">
-			<span class="title">Lorem Ipsum</span>
-			<span class="source">last.fm</span>						
-			<span class="trailtext">Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem  Ipsum Lorem Ipsum </span>
-		</li>
-		<li class="story accepted">
-			<span class="title">Lorem Ipsum</span>
-			<span class="source">last.fm</span>						
-			<span class="trailtext">Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum </span>
-		</li>
-		<li class="story accepted">
-			<span class="title">Lorem Ipsum</span>
-			<span class="source">guardian.co.uk</span>						
-			<span class="trailtext">Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem  </span>
-		</li>
 	</ul>
 </div>
+<div id="log"></div>
 {% endblock %}
 {% block javascript %}
 <script>
