@@ -34,7 +34,7 @@ function hidePage(page) {
 function showPage(page) {
 	$("#page"+page).fadeIn();
 }
-var maxpage = {{pages.count}};
+var maxpage = {{pages.count}}+1;
 $(function(){
 	$(".page").hide();
 	var pagenum = 0;
