@@ -28,11 +28,11 @@ class MainHandler(webapp.RequestHandler):
 class AdminHandler(webapp.RequestHandler):
     @login_required
     def get(self):
-        render_admin_template(self, 'home.html', {})
+        render_admin_template(self, 'home.html', {'pages':Page.all().order('number')})
 
 class EditionHandler(webapp.RequestHandler):
     def get(self, edition=None):
-        render_template(self, 'issue.html', {'pages': Page.all()})
+        render_template(self, 'issue.html', {'pages': Page.all().order('number')})
 
 class TagsHandler(webapp.RequestHandler):
     def get(self):
