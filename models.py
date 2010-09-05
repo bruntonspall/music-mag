@@ -25,8 +25,10 @@ except ImportError:
 import helpers
 from settings import *
 
-#GUARDIAN_API_HOST = 'http://localhost:8700/content-api/api'
-GUARDIAN_API_HOST = 'http://content.guardianapis.com'
+if IS_LOCAL_API:
+    GUARDIAN_API_HOST = 'http://localhost:8700/content-api/api'
+else:
+    GUARDIAN_API_HOST = 'http://content.guardianapis.com'
 
 class Tag(db.Model):
     name = db.StringProperty(required=True)
@@ -68,7 +70,15 @@ class Page(db.Model):
     image = db.StringProperty(required=False)
     
 def get_content_for_guardian_id(id):
-    url = GUARDIAN_API_HOST+"/%s.json?show-fields=all&show-media=picture&api-key=%s" % (id, GU_API_KEY)
+    url = GUARDIAN_API_HOST+"/%s.json?show-fields=all&api-key=%s" % (id, GU_API_KEY)
+    if IS_PARTNER:
+        url += "&show-media=picture"
+    if IS_LOCAL_API:
+        if IS_PARTNER:
+            url += "&userTier=partner"
+        else:
+            url += "&userTier=approved"
+            
     logging.info("Requesting %s", url)
     response = json.loads(urlfetch.fetch(url).content)
     content = response["response"]["content"]
