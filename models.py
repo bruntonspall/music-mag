@@ -17,7 +17,10 @@ import random
 import datetime
 import time
 import logging
-import json
+try:
+    import json
+except ImportError:
+    from django.utils import simplejson as json
 
 import helpers
 from settings import *
