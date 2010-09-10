@@ -88,12 +88,22 @@ class PopulateHandler(webapp.RequestHandler):
         Tag.populate()
         self.response.out.write('OK')
 
+class PopulateWorkerHandler(webapp.RequestHandler):
+    def post(self):
+        user = users.get_current_user()
+        if not user:
+            self.error(500)
+            return
+        Tag.populate_page(self.request.get('page'))
+        self.response.out.write('OK')
+
 def main():
     application = webapp.WSGIApplication([
         ('/', MainHandler),
         ('/admin', AdminHandler),
         ('/admin/(?P<edition>\d+)', AdminEditionHandler),
         ('/admin/populate', PopulateHandler),
+        ('/admin/populate/worker', PopulateWorkerHandler),
         ('/edition/(?P<edition>\d+)', EditionHandler),
         ('/api/tags.json', TagsHandler),
         ('/api/tag/(?P<tag>[a-z/-]+).json', ContentHandler),

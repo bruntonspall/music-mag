@@ -10,6 +10,8 @@ from google.appengine.ext import db
 from google.appengine.api import urlfetch
 
 import logging
+from google.appengine.api.labs import taskqueue
+
 try:
     import json
 except ImportError:
@@ -32,20 +34,25 @@ class Tag(db.Model):
         #Get Guardian Music Tags
         page = 1
         total = 51
-        while (page <= total):
-            url = GUARDIAN_API_HOST+"/tags.json?section=music&page=%d" % (page)
-            content = json.loads(urlfetch.fetch(url).content)
-            for tag in content['response']['results']:
-                obj = Tag.all().filter('name =',tag['webTitle']).get()
-                if obj:
-                    obj.name = tag['webTitle']
-                    obj.guardian_id = tag['id']
-                    obj.save()
-                else:
-                    Tag(name=tag['webTitle'],guardian_id=tag['id'], lastfm_id=tag['id']).save()
-            #Get Last.fm artist names for each tag
-            total = content['response']['pages']
-            page += 1
+        content = json.loads(urlfetch.fetch(GUARDIAN_API_HOST+"/tags.json?section=music").content)
+        total = content['response']['pages']
+        for page in range(total):
+            taskqueue.add(url='/admin/populate/worker', params={'page':page+1}, method='POST')
+
+    @staticmethod
+    def populate_page(page):
+        url = GUARDIAN_API_HOST+"/tags.json?section=music&page=%s" % (page)
+        logging.info('requesting %s', url)
+        content = json.loads(urlfetch.fetch(url).content)
+        for tag in content['response']['results']:
+            obj = Tag.all().filter('name =',tag['webTitle']).get()
+            if obj:
+                obj.name = tag['webTitle']
+                obj.guardian_id = tag['id']
+                obj.save()
+            else:
+                Tag(name=tag['webTitle'],guardian_id=tag['id'], lastfm_id=tag['id']).save()
+
 
     def get_guardian_articles(self):
         url = GUARDIAN_API_HOST+"/%s.json?show-fields=all&api-key=%s" % (self.guardian_id, GU_API_KEY)
