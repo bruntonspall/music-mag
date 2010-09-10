@@ -16,31 +16,11 @@
 #
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
-from google.appengine.ext.webapp.util import login_required
 
 from helpers import *
 from models import *
 
-import logging
 
-class AdminHandler(webapp.RequestHandler):
-    @login_required
-    def get(self):
-        value = KVStore.all().filter('name =', 'CurrentEdition').get()
-        if value:
-            self.redirect('/admin/%d' % value)
-        else:
-            current_edition = KVStore(name='CurrentEdition')
-            current_edition.value = 1
-            current_edition.save()
-            self.redirect('/admin/1')
-
-class AdminEditionHandler(webapp.RequestHandler):
-    @login_required
-    def get(self, edition):
-        render_admin_template(self, 'admin.html', {'pages':Page.all().order('number'), 'edition': edition})
-
-            
 class MainHandler(webapp.RequestHandler):
     def get(self):
         value = KVStore.all().filter('name =', 'CurrentEdition').get()
@@ -51,24 +31,6 @@ class MainHandler(webapp.RequestHandler):
 class EditionHandler(webapp.RequestHandler):
     def get(self, edition):
         render_template(self, 'edition.html', {'pages': Page.all().filter('edition =', int(edition)).order('number')})
-
-    def post(self, edition):
-        logging.info('Posting to edition')
-        for i,arg in enumerate(self.request.arguments()):
-            logging.info('Item %d is %s', i, arg)
-            id = arg.strip("[]")
-            content = get_content_for_guardian_id(id)
-            logging.info("Got content for %s - '%s' - image: %s", id, content['headline'], content['image'])
-            obj = Page.all().filter('number =',i+1).filter('edition =', edition).get()
-            if obj:
-                obj.guardian_article_id=id
-                obj.headline=content['headline']
-                obj.trailtext=content['trailtext']
-                obj.body=content['body']
-                obj.image=content['image']
-                obj.save()
-            else:
-                Page(number=i+1, guardian_article_id=id, headline=content['headline'], trailtext=content['trailtext'], body=content['body'], image=content['image'], edition=int(edition)).save()
 
 class TagsHandler(webapp.RequestHandler):
     def get(self):
@@ -82,28 +44,9 @@ class ContentHandler(webapp.RequestHandler):
     def get(self, tag):
         render_template(self, 'content.json', {'tag': Tag.all().filter('guardian_id =',tag).get(), 'callback':self.request.get('callback')})
 
-class PopulateHandler(webapp.RequestHandler):
-    @login_required
-    def get(self):
-        Tag.populate()
-        self.response.out.write('OK')
-
-class PopulateWorkerHandler(webapp.RequestHandler):
-    def post(self):
-        user = users.get_current_user()
-        if not user:
-            self.error(500)
-            return
-        Tag.populate_page(self.request.get('page'))
-        self.response.out.write('OK')
-
 def main():
     application = webapp.WSGIApplication([
         ('/', MainHandler),
-        ('/admin', AdminHandler),
-        ('/admin/(?P<edition>\d+)', AdminEditionHandler),
-        ('/admin/populate', PopulateHandler),
-        ('/admin/populate/worker', PopulateWorkerHandler),
         ('/edition/(?P<edition>\d+)', EditionHandler),
         ('/api/tags.json', TagsHandler),
         ('/api/tag/(?P<tag>[a-z/-]+).json', ContentHandler),

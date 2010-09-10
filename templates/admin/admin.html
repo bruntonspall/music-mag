@@ -4,7 +4,7 @@
     var edition = {{edition}};
 function submit_edition(){
 	var pages = $('#accepted_list').sortable("serialize");
-	$.post('/edition/'+edition, pages);
+	$.post('/admin/'+edition, pages);
 	$('#log').empty();
 	$('#log').append("<p>"+pages+"</p>");	
 }
