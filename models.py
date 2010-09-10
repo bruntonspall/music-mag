@@ -8,9 +8,6 @@ Copyright (c) 2010 __MyCompanyName__. All rights reserved.
 """
 from google.appengine.ext import db
 
-import logging
-from google.appengine.api.labs import taskqueue
-
 class Tag(db.Model):
     name = db.StringProperty(required=True)
     guardian_id = db.StringProperty(required=True)
