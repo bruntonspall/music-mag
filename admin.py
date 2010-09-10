@@ -21,6 +21,7 @@ from helpers import *
 from models import *
 
 import logging
+from guardian_api import get_content_for_guardian_id, get_tags
 
 class AdminHandler(webapp.RequestHandler):
     def get(self):
@@ -57,7 +58,7 @@ class AdminEditionHandler(webapp.RequestHandler):
 class PopulateHandler(webapp.RequestHandler):
     def get(self):
         #Get Guardian Music Tags
-        content = json.loads(urlfetch.fetch(GUARDIAN_API_HOST+"/tags.json?section=music").content)
+        content = get_tags("music")
         total = content['response']['pages']
         for page in range(total):
             taskqueue.add(url='/admin/populate/worker', params={'page':page+1}, method='POST')
@@ -65,19 +66,17 @@ class PopulateHandler(webapp.RequestHandler):
 
 class PopulateWorkerHandler(webapp.RequestHandler):
     def post(self):
-        url = GUARDIAN_API_HOST+"/tags.json?section=music&page=%s" % (self.request.get('page'))
-        logging.info('requesting %s', url)
-        content = json.loads(urlfetch.fetch(url).content)
+        content = get_tags('music', self.request.get('page'))
         for tag in content['response']['results']:
             name = tag['webTitle']
             obj = Tag.all().filter('name =',name).get()
             if obj:
-                logging.info('Updating tag: ', name)
+                logging.info('Updating tag: %s', name)
                 obj.name = name
                 obj.guardian_id = tag['id']
                 obj.save()
             else:
-                logging.info('Creating tag: ', name)
+                logging.info('Creating tag: %s', name)
                 Tag(name=name,guardian_id=tag['id'], lastfm_id=tag['id']).save()
         self.response.out.write('OK')
 
