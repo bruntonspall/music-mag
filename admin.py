@@ -69,13 +69,16 @@ class PopulateWorkerHandler(webapp.RequestHandler):
         logging.info('requesting %s', url)
         content = json.loads(urlfetch.fetch(url).content)
         for tag in content['response']['results']:
-            obj = Tag.all().filter('name =',tag['webTitle']).get()
+            name = tag['webTitle']
+            obj = Tag.all().filter('name =',name).get()
             if obj:
-                obj.name = tag['webTitle']
+                logging.info('Updating tag: ', name)
+                obj.name = name
                 obj.guardian_id = tag['id']
                 obj.save()
             else:
-                Tag(name=tag['webTitle'],guardian_id=tag['id'], lastfm_id=tag['id']).save()
+                logging.info('Creating tag: ', name)
+                Tag(name=name,guardian_id=tag['id'], lastfm_id=tag['id']).save()
         self.response.out.write('OK')
 
 def main():

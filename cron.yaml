@@ -1,0 +1,4 @@
+cron:
+- description: daily tag update job
+  url: /admin/populate
+  schedule: every 24 hours
