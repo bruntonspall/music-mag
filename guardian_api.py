@@ -33,7 +33,7 @@ def get_json(path, args):
     return json.loads(make_request(path, args))
 
 def get_content_for_guardian_id(id):
-    args = {}
+    args = {"show-fields":"all"}
     if IS_PARTNER:
         args["show-media"]="picture"
     response = get_json(id, args)
@@ -45,7 +45,7 @@ def get_content_for_guardian_id(id):
     return {'headline':content["fields"]["headline"], 'trailtext':content["fields"]["trailText"],'body':content["fields"]["body"], 'image':image,'id':content["id"]}
 
 def get_guardian_articles(tag):
-    get_json(tag, {})
+    response = get_json(tag, {"show-fields":"headline,trailText"})
     return [{'headline':content["fields"]["headline"],
              'trailtext':content["fields"]["trailText"],
              'id':content["id"]} for content in response["response"]["results"]]

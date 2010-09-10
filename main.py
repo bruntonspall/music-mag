@@ -31,14 +31,15 @@ class MainHandler(webapp.RequestHandler):
 
 class EditionHandler(webapp.RequestHandler):
     def get(self, edition):
-        render_template(self, 'edition.html', {'pages': Page.all().filter('edition =', int(edition)).order('number')})
+        edition = int(edition)
+        render_template(self, 'edition.html', {'pages': Page.all().filter('edition =', edition).order('number')})
 
 class TagsHandler(webapp.RequestHandler):
     def get(self):
         term = self.request.get('term')
         tags = Tag.all()
         if term:
-            tags.filter('name >',term).filter('name < ',term+u'\ufffd')
+            tags.filter('lname >',term.lower()).filter('lname < ',term.lower()+u'\ufffd')
         render_template(self, 'tags.json', {'items': tags, 'callback':self.request.get('callback')})
         
 class ContentHandler(webapp.RequestHandler):

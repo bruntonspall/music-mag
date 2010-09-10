@@ -36,9 +36,12 @@ class AdminHandler(webapp.RequestHandler):
 
 class AdminEditionHandler(webapp.RequestHandler):
     def get(self, edition):
-        render_admin_template(self, 'admin.html', {'pages':Page.all().order('number'), 'edition': edition})
+        edition = int(edition)
+        render_admin_template(self, 'admin.html', {'pages':Page.all().filter('edition =', edition).order('number'), 'edition': edition})
     def post(self, edition):
-        logging.info('Posting to edition')
+        edition = int(edition)
+        logging.info('Posting to edition %s' % (edition))
+        db.delete(Page.all().filter('edition =', edition))
         for i,arg in enumerate(self.request.arguments()):
             logging.info('Item %d is %s', i, arg)
             id = arg.strip("[]")
@@ -53,7 +56,16 @@ class AdminEditionHandler(webapp.RequestHandler):
                 obj.image=content['image']
                 obj.save()
             else:
-                Page(number=i+1, guardian_article_id=id, headline=content['headline'], trailtext=content['trailtext'], body=content['body'], image=content['image'], edition=int(edition)).save()
+                Page(number=i+1,
+                     guardian_article_id=id,
+                     headline=content['headline'],
+                     trailtext=content['trailtext'],
+                     body=content['body'],
+                     image=content['image'],
+                     edition=edition).save()
+        current_edition = KVStore(name='CurrentEdition')
+        current_edition.value = edition
+        current_edition.save()
 
 class PopulateHandler(webapp.RequestHandler):
     def get(self):

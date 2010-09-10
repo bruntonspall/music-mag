@@ -10,8 +10,13 @@ from google.appengine.ext import db
 
 class Tag(db.Model):
     name = db.StringProperty(required=True)
+    lname = db.StringProperty(required=True)
     guardian_id = db.StringProperty(required=True)
     lastfm_id = db.StringProperty(required=True)
+
+    def __init__(self, *args, **kwargs):
+        kwargs['lname'] = kwargs['name'].lower()
+        db.Model.__init__(self, *args, **kwargs)
             
 class Page(db.Model):
     edition = db.IntegerProperty(required=True)
