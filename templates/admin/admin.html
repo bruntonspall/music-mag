@@ -1,6 +1,13 @@
 {% extends "adminbase.html" %}
 {% block javascript %}
 <script>
+    var edition = {{edition}};
+function submit_edition(){
+	var pages = $('#accepted_list').sortable("serialize");
+	$.post('/edition/'+edition, pages);
+	$('#log').empty();
+	$('#log').append("<p>"+pages+"</p>");	
+}
 $(function(){
 	$('#story_search').autocomplete({source:'/api/tags.json', select:function(event, ui){
 		$('#prospective_list').empty();
@@ -12,13 +19,15 @@ $(function(){
 		});
 	}});
 	$('#submit-edition').click(function(){
-		var pages = $('#accepted_list').sortable("serialize");
-		$.post('/issue/new', pages);
-		$('#log').empty();
-		$('#log').append("<p>"+pages+"</p>");
+		submit_edition();
 	});
 	$('#prospective_list').sortable({connectWith: '.accepted_list', revert: true});
-	$('#accepted_list').sortable({revert: true});
+	$('#accepted_list').sortable({revert: true, drop: function(ev, ui) {
+		submit_edition();
+	}});
+	$('.story .button').click(function(ev) {
+		$(this).parent().remove();
+	})
 });
 </script>
 {% endblock	%}
@@ -30,21 +39,16 @@ $(function(){
 	<input type="text" id="story_search" name="story_search" placeholder="Band/Album/Keyword">
 	 
 	<ul id="prospective_list" class="prospective_list drop_target">
-		{% for story in prospective_stories %}
-		<li class="story prospective">
-			<span class="title">{{story.title}}</span>
-			<span class="source">{{story.source}}</span>
-			<span class="trailtext">{{story.trailtext}}</span>
-		</li>
-		{% endfor %}
 	</ul>
 </div>
 <div class="grid_9">
 	<ul id="accepted_list" class="accepted_list drop_target">
 		{% for story in pages %}
-		<li class="story accepted">
+		<li class="story accepted" id='{{story.guardian_article_id}}_0'>
 			<span class="title">{{story.title}}</span>
+			<span class="byline">{{story.byline}}</span>
 			<span class="trailtext">{{story.trailtext}}</span>
+			<span class="button remove">Remove</span>
 		</li>
 		{% endfor %}
 	</ul>

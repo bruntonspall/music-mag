@@ -6,23 +6,15 @@ models.py
 Created by MBS on 2010-08-13.
 Copyright (c) 2010 __MyCompanyName__. All rights reserved.
 """
-from google.appengine.api import memcache
 from google.appengine.ext import db
-from google.appengine.ext.webapp import template
-from google.appengine.ext.db import djangoforms
 from google.appengine.api import urlfetch
 
-
-import random
-import datetime
-import time
 import logging
 try:
     import json
 except ImportError:
     from django.utils import simplejson as json
 
-import helpers
 from settings import *
 
 if IS_LOCAL_API:
@@ -59,9 +51,12 @@ class Tag(db.Model):
         url = GUARDIAN_API_HOST+"/%s.json?show-fields=all&api-key=%s" % (self.guardian_id, GU_API_KEY)
         logging.info("Requesting %s", url)
         response = json.loads(urlfetch.fetch(url).content)
-        return [{'headline':content["fields"]["headline"], 'trailtext':content["fields"]["trailText"], 'id':content["id"]} for content in response["response"]["results"]]
+        return [{'headline':content["fields"]["headline"], 
+                 'trailtext':content["fields"]["trailText"],
+                 'id':content["id"]} for content in response["response"]["results"]]
         
 class Page(db.Model):
+    edition = db.IntegerProperty(required=True)
     number = db.IntegerProperty(required=True)
     guardian_article_id = db.StringProperty(required=False)
     headline = db.StringProperty(required=True)
@@ -86,4 +81,7 @@ def get_content_for_guardian_id(id):
     if content.has_key('mediaAssets'):
         image = content["mediaAssets"][0]["file"]
     return {'headline':content["fields"]["headline"], 'trailtext':content["fields"]["trailText"],'body':content["fields"]["body"], 'image':image,'id':content["id"]}
-    
+
+
+class KVStore(db.Expando):
+    name = db.StringProperty(required=True)

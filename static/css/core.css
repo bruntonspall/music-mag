@@ -140,3 +140,15 @@ li span.trailtext {
 .next {
     font-size: 24px;    
 }
+
+.button {
+    border: 2px black solid;
+    margin: 15px 0px;
+    padding: 5px;
+    width: auto;
+    display: block;
+    -webkit-border-radius: 10px;
+       -moz-border-radius: 10px;
+            border-radius: 10px;
+    cursor: pointer;
+}

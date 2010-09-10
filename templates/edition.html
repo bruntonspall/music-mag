@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Edition {{edition}}{% endblock %}
+{% block scripts %}
+<script>
+function hidePage(page) {
+	$("#page"+page).fadeOut();
+}
+function showPage(page) {
+	$("#page"+page).fadeIn();
+}
+var maxpage = {{pages.count}}+1;
+$(function(){
+	$(".page").hide();
+	var pagenum = 0;
+	$("#next").click(function() {
+		hidePage(pagenum);
+		pagenum = (pagenum + 1) % maxpage;
+		showPage(pagenum);
+	});
+	$(".page").click(function() {
+		hidePage(pagenum);
+		pagenum = (pagenum + 1) % maxpage;
+		showPage(pagenum);
+	});
+	showPage(pagenum);
+})
+</script>
+{% endblock %}
+{% block body %}
+	<div class="container_24">
+		<h1>Music Mag Edition {{edition}}</h1>		
+        <div class="page table-of-contents grid_24" id="page0">
+            <ol>
+                {% for page in pages %}
+                    <li class="tocline"><span><a href="#page{{page.number}}">{{page.number}}</a></span><span class="trailtext">{{page.headline}}</span></li>
+                {% endfor %}
+            </ol>
+
+            </div>
+        {% for page in pages %}
+        <div class="page grid_24" id="page{{page.number}}">
+            <h2>{{page.number}} - {{page.headline}}</h2>
+            <div class="byline">{{page.byline}}</div>
+            <div class="twocol story">{% if page.image %}<img src="{{page.image}}">{% endif %}{{page.body}}</div>
+            <div class="original">Originally from {{page.weblink}}</div>
+        </div>
+        {% endfor %}
+        <div class="grid_24 next" id="next">Next</div>
+	</div>
+{% endblock %}
