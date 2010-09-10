@@ -19,6 +19,7 @@ from google.appengine.ext.webapp import util
 
 from helpers import *
 from models import *
+from guardian_api import get_guardian_articles
 
 
 class MainHandler(webapp.RequestHandler):
@@ -38,11 +39,14 @@ class TagsHandler(webapp.RequestHandler):
         tags = Tag.all()
         if term:
             tags.filter('name >',term).filter('name < ',term+u'\ufffd')
-        render_template(self, 'tags.json', {'tags': tags, 'callback':self.request.get('callback')})
+        render_template(self, 'tags.json', {'items': tags, 'callback':self.request.get('callback')})
         
 class ContentHandler(webapp.RequestHandler):
     def get(self, tag):
-        render_template(self, 'content.json', {'tag': Tag.all().filter('guardian_id =',tag).get(), 'callback':self.request.get('callback')})
+        tag = Tag.all().filter('guardian_id =', tag).get()
+        if tag:
+            return render_template(self, 'content.json', {'items': get_guardian_articles(tag.guardian_id), 'callback':self.request.get('callback')})
+        self.error(500)    
 
 def main():
     application = webapp.WSGIApplication([

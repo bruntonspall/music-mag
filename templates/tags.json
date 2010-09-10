@@ -1,11 +1,8 @@
-{% if callback %}{{callback}}({% endif %}
-[
-{% for tag in tags %}
+{% extends "base.json" %}
+{% block item %}
 {
-"id":"{{tag.guardian_id}}",
-"value":"{{tag.name}}",
-"label":"{{tag.name}}"
+"id":"{{item.guardian_id}}",
+"value":"{{item.name}}",
+"label":"{{item.name}}"
 }
-{% if forloop.last %}{% else %},{% endif %}
-{% endfor %}]
-{% if callback %});({% endif %}
+{% endblock %}
