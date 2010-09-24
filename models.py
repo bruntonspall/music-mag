@@ -4,7 +4,6 @@
 models.py
 
 Created by MBS on 2010-08-13.
-Copyright (c) 2010 __MyCompanyName__. All rights reserved.
 """
 from google.appengine.ext import db
 
